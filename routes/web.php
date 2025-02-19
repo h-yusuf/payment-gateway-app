@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -9,7 +11,14 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+// Product Routes (CRUD)
+Route::middleware('auth')->group(function () {
+    Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+    Route::post('/products', [ProductController::class, 'store'])->name('products.store');
+});
 
-Route::middleware(['auth', 'role:seller'])->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index']);
+// Payment Routes (Midtrans)
+Route::middleware('auth')->group(function () {
+    Route::get('/checkout/{id}', [PaymentController::class, 'checkout'])->name('checkout');
+    Route::post('/payment/notification', [PaymentController::class, 'notificationHandler']);
 });
